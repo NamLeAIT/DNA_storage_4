@@ -1,0 +1,27 @@
+DNA platform update v3
+
+Updated files:
+- compressors_v2.py
+- pipelines_v2.py
+- tab_designing.py
+
+Main changes:
+1) More compression tools and broader data-type coverage
+   - New/expanded routing: text, document, archive, binary, other, plus image/audio/video
+   - Added candidate families across domains: gzip (multi-level), bz2, xz, zip/rezip, webp/jpeg/png, FLAC/Opus/MP3/AAC, H264/VP9/AV1
+   - Added restore support for XZ and BZ2 payloads
+
+2) Compression flow simplified to auto-only
+   - Compression tab now effectively uses only Auto Fixed and Auto Benchmark
+   - Auto routing is Mode-3 only for compression workloads
+
+3) Benchmark metadata added to reports and Analysis tab
+   - report["analysis"] with selected_method, score_metric, candidates_tested
+   - report["benchmark"] with full candidate ranking and Top 3
+   - Analysis tab shows Benchmark Results block and Top 3 table
+
+Smoke tests completed:
+- py_compile on all 3 files: pass
+- run_mode3_domain(... codec_mode='TABLE'): pass
+- run_mode3_best(... codec_mode='TABLE'): pass
+- document/PDF and text benchmark payload generation: pass

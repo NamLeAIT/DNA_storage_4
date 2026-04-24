@@ -1,0 +1,32 @@
+DNA platform update v4
+
+Updated files:
+- compressors_v2.py
+- pipelines_v2.py
+- tab_designing.py
+
+Main changes:
+1. Expanded compression candidates across all domains
+   - text/document/archive/binary/other: keep + gzip(1,6,9) + bz2(1,5,9) + xz(3,6,9) + zip(1,6,9)
+   - OOXML docs: added ooxml_rezip(1,6,9)
+   - image: keep + png_lossless + webp_lossless + webp_q(50,60,70,80,90) + jpeg_q(50,60,70,80,90)
+   - audio: keep + flac + opus(24,32,48,64,96,128) + mp3(96,128,160,192,256) + aac(96,128,160,192)
+   - video benchmark grids widened substantially around the UI CRF setting
+
+2. Auto routing updated
+   - Auto Fixed / Auto Benchmark now route PDFs and all supported domains into the domain-aware pipeline
+   - mode2_zip_store remains only as a legacy/internal fallback, not the normal auto path
+
+3. Benchmark payload enriched
+   - benchmark_percent
+   - size_saving_pct
+   - delta_vs_best_pct
+   - domain
+   - top3 and full candidate table preserved in report
+
+4. Analysis tab updated
+   - Added Benchmark Results section
+   - Shows domain, selected method, candidates tested, chart of top 3, and a detailed top-3 table
+
+5. Engine tag
+   - engine_version = v4_auto_only_expanded_benchmark
