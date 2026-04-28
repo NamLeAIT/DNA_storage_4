@@ -133,3 +133,73 @@ def render_ngs_prep():
             view.insert(0,"Fragment", view["fragment_index"].map(lambda x:f"Fragment {int(x)}"))
             view=view.rename(columns={"fragment_index":"Number","is_parity_fragment":"Parity","payload_length_nt":"Payload Length (nt)","fragment_length_nt":"Fragment Length (nt)","gc_ratio":"GC Ratio","max_homopolymer":"Max Homopolymer","score":"Score","difficulty":"Difficulty"})
             st.dataframe(view, width="stretch", hide_index=True)
+
+            st.markdown("#### 🔍 Fragment Detail View")
+            data_fragments = [x for x in result.fragments if not getattr(x, "is_parity_fragment", False)]
+            if data_fragments:
+                selected_name = st.selectbox(
+                    "Choose a fragment",
+                    options=[x.fragment_name for x in data_fragments],
+                    index=0,
+                    format_func=lambda name: f"Fragment {int(next(r.fragment_index for r in data_fragments if r.fragment_name == name))}",
+                    key="ngs_prep_fragment_detail_v4",
+                )
+                rec = next((x for x in data_fragments if x.fragment_name == selected_name), None)
+
+                if rec is not None:
+                    barcode_text = rec.sample_barcode if rec.sample_barcode else "—"
+                    checksum_text = rec.checksum if rec.checksum else "—"
+
+                    structure = f"""5' ─┬─ Forward Primer ({len(rec.forward_primer)} nt)
+    │   {rec.forward_primer}
+    ├─ Sample Barcode ({len(rec.sample_barcode)} nt)
+    │   {barcode_text}
+    ├─ Fragment ID ({len(rec.fragment_id)} nt)
+    │   {rec.fragment_id if rec.fragment_id else '—'}
+    ├─ Payload ({len(rec.payload)} nt)
+    │   {rec.payload[:80]}{'...' if len(rec.payload) > 80 else ''}
+    ├─ Checksum ({len(rec.checksum)} nt)
+    │   {checksum_text}
+    └─ Reverse Primer ({len(rec.reverse_primer)} nt)
+        {rec.reverse_primer}
+─── 3'"""
+
+                    st.code(structure, language="text")
+                    st.markdown("**Full sequence**")
+                    st.text_area(
+                        "Full sequence",
+                        value=rec.full_sequence,
+                        height=150,
+                        label_visibility="collapsed",
+                        key="ngs_prep_full_sequence_v4",
+                    )
+
+                    if exports:
+                        e1, e2, e3 = st.columns(3)
+                        with e1:
+                            if exports.get("fasta") and os.path.exists(exports["fasta"]):
+                                st.download_button(
+                                    "Export FASTA",
+                                    data=open(exports["fasta"], "rb").read(),
+                                    file_name=os.path.basename(exports["fasta"]),
+                                    width="stretch",
+                                    key="ngs_prep_export_fasta_v4",
+                                )
+                        with e2:
+                            if exports.get("csv") and os.path.exists(exports["csv"]):
+                                st.download_button(
+                                    "Export CSV",
+                                    data=open(exports["csv"], "rb").read(),
+                                    file_name=os.path.basename(exports["csv"]),
+                                    width="stretch",
+                                    key="ngs_prep_export_csv_v4",
+                                )
+                        with e3:
+                            if exports.get("json") and os.path.exists(exports["json"]):
+                                st.download_button(
+                                    "Export Manifest",
+                                    data=open(exports["json"], "rb").read(),
+                                    file_name=os.path.basename(exports["json"]),
+                                    width="stretch",
+                                    key="ngs_prep_export_manifest_v4",
+                                )
